@@ -1,12 +1,12 @@
 const Token = artifacts.require("Token");
-const Wallet = artifacts.require("Wallet");
+const Exchange = artifacts.require("Exchange");
 
 module.exports = async function (deployer, network, accounts) {
-  deployer.deploy(Token);
-  let wallet = await Wallet.deployed();
+  await deployer.deploy(Token);
+  let exchange = await Exchange.deployed();
   let token = await Token.deployed();
 
-  await token.approve(wallet.address, 500);
-  await wallet.addToken(web3.utils.fromUtf8(token.symbol()), token.address);
-  await wallet.deposit(500, web3.utils.fromUtf8(token.symbol()));
+  //await token.approve(exchange.address, 500);
+  //await exchange.addToken(web3.utils.fromUtf8(token.symbol()), token.address);
+  //await exchange.deposit(500, web3.utils.fromUtf8(token.symbol()));
 };
