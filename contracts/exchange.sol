@@ -29,22 +29,36 @@ contract Exchange is Wallet {
 
     function createLimitOrder(Orderdirection direction, bytes32 ticker, uint amount, uint price) public {
         if(direction == Orderdirection.BUY) {
-            require(balances[msg.sender]["ETH"] >= amount.mul(price));
+            require(balances[msg.sender][bytes32("ETH")] >= amount.mul(price));
         }
         else if(direction == Orderdirection.SELL) {
             require(balances[msg.sender][ticker] >= amount);
         }
 
-        Order[] storage orders = orderBook[ticker][uint(direction)];
+        Order[] storage orders = orderbook[ticker][uint(direction)];
         orders.push(Order(nextOrderId, msg.sender, direction, ticker, amount, price));
         
         //Bubble sort
-        if(direction == Orderdirection.BUY) {
-
+        //uint i = orders.length > 0 ? orders.length - 1 : 0;
+        
+        if(direction == Orderdirection.BUY && orders.length > 1) {
+            for(uint i = orders.length - 1; i > 0; i--) {
+                if(orders[i].price > orders[i-1].price) {
+                    Order memory ordertomove = orders[i];
+                    orders[i] = orders[i-1];
+                    orders[i-1] = ordertomove;
+                }
+            }
         }
         
-        if(direction == Orderdirection.SELL) {
-            
+        if(direction == Orderdirection.SELL && orders.length > 1) {
+            for(uint i = orders.length - 1; i > 0; i--) {
+                if(orders[i].price < orders[i-1].price) {
+                    Order memory ordertomove = orders[i];
+                    orders[i] = orders[i-1];
+                    orders[i-1] = ordertomove;
+                }
+            }
         }
         
         nextOrderId ++;

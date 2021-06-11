@@ -1,19 +1,18 @@
 const Exchange = artifacts.require("Exchange")
 const Token = artifacts.require("Token")
-const { reverts } = require("truffle-assertions");
 const truffleAssert = require("truffle-assertions");
 
 contract("Exchange", accounts => {
     it("should throw an error if ETH balance is too low when creating BUY limit order", async () => {
-        let exchange = await Exchange.deployed()
-        let token = await Token.deployed()
+        let exchange = await Exchange.deployed();
+        let token = await Token.deployed();
         await truffleAssert.reverts(
             exchange.createLimitOrder(0, web3.utils.fromUtf8(token.symbol()), 10, 1)
-        )
-        exchange.depositEth({value: 10})
+        );
+        exchange.depositEth({value: 10});
         await truffleAssert.passes(
             exchange.createLimitOrder(0, web3.utils.fromUtf8(token.symbol()), 10, 1)
-        )
+        );
     })
 
     it("should be possible to sell tokens with enough balance", async () => {
@@ -39,10 +38,9 @@ contract("Exchange", accounts => {
         await exchange.createLimitOrder(0, web3.utils.fromUtf8(token.symbol()), 1, 200);
 
         let orderbook = await exchange.getOrderBook(web3.utils.fromUtf8(token.symbol()), 0);
-        assert(orderbook.length > 0);
         if(orderbook.length > 0) {        
             for(let i = 0; i < orderbook.length - 1; i++){
-                assert(orderbook[i].price >= orderbokk[i+1].price);
+                assert(orderbook[i].price >= orderbook[i+1].price);
             }
         }
     })
@@ -59,7 +57,7 @@ contract("Exchange", accounts => {
         assert(orderbook.length > 0);
         if(orderbook.length > 0) {
             for(let i = 0; i < orderbook.length - 1; i++){
-                assert(orderbook[i].price <= orderbokk[i+1].price);
+                assert(orderbook[i].price <= orderbook[i+1].price);
             }
         }
     })
