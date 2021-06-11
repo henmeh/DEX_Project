@@ -2,7 +2,7 @@ const Exchange = artifacts.require("Exchange")
 const Token = artifacts.require("Token")
 const truffleAssert = require("truffle-assertions");
 
-contract.skip("Exchange", accounts => {
+contract("Exchange", accounts => {
     it("should only be possible for owner to add tokens", async () => {
         let exchange = await Exchange.deployed();
         let token = await Token.deployed();

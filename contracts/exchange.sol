@@ -16,6 +16,7 @@ contract Exchange is Wallet {
         bytes32 ticker;
         uint amount;
         uint price;
+        uint filled;
     }
     
     // Mapping Token => Buy or Sell => Orderbook
@@ -36,7 +37,7 @@ contract Exchange is Wallet {
         }
 
         Order[] storage orders = orderbook[ticker][uint(direction)];
-        orders.push(Order(nextOrderId, msg.sender, direction, ticker, amount, price));
+        orders.push(Order(nextOrderId, msg.sender, direction, ticker, amount, price, 0));
         
         //Bubble sort
         //uint i = orders.length > 0 ? orders.length - 1 : 0;
@@ -62,5 +63,53 @@ contract Exchange is Wallet {
         }
         
         nextOrderId ++;
+    }
+
+    function createMarketOrder(Orderdirection direction, bytes32 ticker, uint amount) public {
+        if(direction == Orderdirection.SELL) {
+            require(balances[msg.sender][ticker] >= amount, "Insufficient balance");
+        }
+
+        Order[] storage orders = orderbook[ticker][direction == Orderdirection.BUY ? 1 : 0];
+        uint totalFilled;
+
+        for(uint i = 0; i < orders.length && totalFilled < amount; i++) {
+            uint leftToFill = amount.sub(totalFilled);
+            uint availableToFill = orders[i].amount.sub(orders[i].filled);
+            uint filled = 0;
+            if(availableToFill > leftToFill) {
+                filled = leftToFill;
+            }
+            else {
+             filled = availableToFill;   
+            }
+            totalFilled = totalFilled.add(filled);
+            orders[i].filled = orders[i].filled.add(filled);
+            uint cost = filled.mul(orders[i].price);
+
+            if(direction == Orderdirection.BUY) {
+                require(balances[msg.sender][bytes32("ETH")] >= filled.mul(orders[i].price));
+                //Transfer ETH from Buyer to Seller
+                balances[msg.sender][bytes32("ETH")] = balances[msg.sender][bytes32("ETH")].sub(cost);
+                balances[orders[i].trader][bytes32("ETH")] = balances[orders[i].trader][bytes32("ETH")].add(cost); 
+                //Transfer Tokens from Seller to Buyer
+                balances[msg.sender][ticker] = balances[msg.sender][ticker].add(filled);
+                balances[orders[i].trader][ticker] = balances[orders[i].trader][ticker].sub(filled); 
+            }
+            else if (direction == Orderdirection.SELL) {
+                //Transfer ETH from Buyer to Seller
+                balances[orders[i].trader][bytes32("ETH")] = balances[orders[i].trader][bytes32("ETH")].sub(cost);
+                balances[msg.sender][bytes32("ETH")] = balances[msg.sender][bytes32("ETH")].add(cost); 
+                //Transfer Tokens from Seller to Buyer
+                balances[orders[i].trader][ticker] = balances[orders[i].trader][ticker].add(filled);
+                balances[msg.sender][ticker] = balances[msg.sender][ticker].sub(filled); 
+            }
+        }
+        while(orders.length > 0 && orders[0].filled == orders[0].amount) {
+            for(uint i = 0; i < orders.length - 1; i++) {
+                orders[i] = orders[i+1];
+            }
+            orders.pop();
+        }
     }
 }
