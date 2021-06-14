@@ -1,2 +1,4 @@
 /node_modules
 /build
+wallet.json
+/web/addresses.js
