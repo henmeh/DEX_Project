@@ -18,6 +18,8 @@ contract("Exchange", accounts => {
     it("should handle deposits correctly", async () => {
         let exchange = await Exchange.deployed();
         let token = await Token.deployed();
+        console.log(await token.symbol());
+        console.log(typeof(await token.symbol()));
         await token.approve(exchange.address, 500);
         await exchange.deposit(100, web3.utils.fromUtf8(token.symbol()));
         let balance = await exchange.balances(accounts[0], web3.utils.fromUtf8(token.symbol()));

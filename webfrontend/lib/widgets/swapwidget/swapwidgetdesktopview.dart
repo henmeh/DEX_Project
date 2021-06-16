@@ -20,6 +20,7 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
       new TextEditingController();
   TextEditingController priceController = new TextEditingController();
   Future tokens;
+  Future orderBook;
   int side;
 
   List colors = [Colors.purpleAccent, Colors.white];
@@ -28,6 +29,7 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
   @override
   void initState() {
     tokens = getTokenlist();
+    orderBook = getOrderbook([0, "HT"]);
     super.initState();
   }
 

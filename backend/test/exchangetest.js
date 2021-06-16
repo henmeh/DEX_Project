@@ -2,7 +2,7 @@ const Exchange = artifacts.require("Exchange")
 const Token = artifacts.require("Token")
 const truffleAssert = require("truffle-assertions");
 
-contract("Exchange", accounts => {
+contract.skip("Exchange", accounts => {
     it("should throw an error if ETH balance is too low when creating BUY limit order", async () => {
         let exchange = await Exchange.deployed();
         let token = await Token.deployed();
@@ -63,7 +63,7 @@ contract("Exchange", accounts => {
     })
 })
 
-contract("Exchange", accounts => {
+contract.skip("Exchange", accounts => {
     it("Should throw an error when creating a sell market order without adequate token balance", async () => {
         let exchange = await Exchange.deployed()
         let token = await Token.deployed()

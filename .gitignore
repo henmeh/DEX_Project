@@ -1,7 +1,7 @@
-/node_modules
-/build
-wallet.json
-/web/addresses.js
+backend/node_modules
+backend/build
+backend/wallet.json
+webfrontend/web/addresses.js
 
 # Miscellaneous
 *.class

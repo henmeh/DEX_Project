@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:js_util';
+import 'dart:math';
 import '../widgets/javascript_controller.dart';
 
 //get my Balances from Moralis
@@ -79,7 +80,9 @@ Future getTokenlist() async {
 Future depositNewToken(List _arguments) async {
   String _amount = _arguments[0];
   String _ticker = _arguments[1];
-  var promise = depositToken(_amount, _ticker);
+  String _decimals = _arguments[2];
+  double _tradingAmount = double.parse(_amount) * pow(10, int.parse(_decimals));
+  var promise = depositToken(_tradingAmount.toString(), _ticker);
   var deposit = await promiseToFuture(promise);
 }
 

@@ -88,6 +88,31 @@ var exchangeAbi = [
     "payable": true
   },
   {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "ticker",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getTokenAddress",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
     "inputs": [],
     "name": "getTokenlist",
     "outputs": [

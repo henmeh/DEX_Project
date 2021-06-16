@@ -49,6 +49,8 @@ async function getOrderBook(_ticker, _side) {
         //_side = 0 or 1
         // _ticker = String
         let orderBook = await ExchangeInstance.methods.getOrderBook(web3.utils.fromUtf8(_ticker), _side).call();
+        console.log(orderBook);
+        return orderBook;
     } catch (error) { console.log(error); }
 }
 
@@ -58,8 +60,8 @@ async function depositToken(_amount, _ticker) {
         // _ticker = String
         user = await Moralis.User.current();
         const userAddress = user.get("ethAddress");
-        let approve = await TokenInstance.methods.approve(addresses["exchange"], web3.utils.toWei(web3.utils.toBN(_amount), "ether")).send({from: userAddress});
-        let deposit = await ExchangeInstance.methods.deposit(web3.utils.toWei(web3.utils.toBN(_amount), "ether"), web3.utils.fromUtf8(_ticker)).send({from: userAddress});
+        await TokenInstance.methods.approve(addresses["exchange"], _amount).send({from: userAddress});
+        await ExchangeInstance.methods.deposit(_amount, web3.utils.fromUtf8(_ticker)).send({from: userAddress});
     } catch (error) { console.log(error); }
 }
 
@@ -78,7 +80,7 @@ async function depositEth(_amount) {
         //_amount = String
         user = await Moralis.User.current();
         const userAddress = user.get("ethAddress");
-        let deposit = await ExchangeInstance.methods.depositEth().send({from: userAddress, value: web3.utils.toWei(web3.utils.toBN(_amount), "ether")});
+        let deposit = await ExchangeInstance.methods.depositEth().send({from: userAddress, value: web3.utils.toWei(_amount, "ether")});
     } catch (error) { console.log(error); }
 }
 

@@ -22,6 +22,7 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
     for (var i = 0; i < widget.myBalances.length; i++) {
       controllers.add(new TextEditingController());
     }
+    print(widget.myBalances);
     return widget.myBalances != []
         ? SingleChildScrollView(
             child: Row(
@@ -135,7 +136,11 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                                       .highlightColor,
                                                   "Deposit Token",
                                                   depositNewToken,
-                                                  [amount, element["symbol"]])
+                                                  [
+                                                      amount,
+                                                      element["symbol"],
+                                                      element["decimals"]
+                                                    ])
                                         ],
                                       ),
                                     ),
@@ -188,7 +193,7 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                             "Add Token",
                                             addNewToken, [
                                             element["symbol"],
-                                            element["address"]
+                                            element["token_address"]
                                           ])
                                         : Container()),
                                   ],
