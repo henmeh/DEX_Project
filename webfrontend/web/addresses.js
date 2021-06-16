@@ -1,4 +1,4 @@
 addresses = {
-    "exchange": "0xb31149Cea5049fE030De70163715afAecE294193",
+    "exchange": "0x4A300b38b8bdc92841628DDd7B031390834837B2",
     "token": "0xb546aF79d20f3c8bC2BC3DAc896df695B2E73AC4",
 }

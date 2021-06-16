@@ -22,7 +22,6 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
     for (var i = 0; i < widget.myBalances.length; i++) {
       controllers.add(new TextEditingController());
     }
-    print(widget.myBalances);
     return widget.myBalances != []
         ? SingleChildScrollView(
             child: Row(
@@ -55,6 +54,12 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                         DataColumn(
                             label: Text(
                           "Deposit Funds in Dex",
+                          style:
+                              TextStyle(color: Theme.of(context).accentColor),
+                        )),
+                        DataColumn(
+                            label: Text(
+                          "Withdraw Funds from Dex",
                           style:
                               TextStyle(color: Theme.of(context).accentColor),
                         )),
@@ -102,7 +107,7 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                                 .indexOf(element)],
                                             labelText: "Input Amount",
                                             leftMargin: 0,
-                                            topMargin: 0,
+                                            topMargin: 5,
                                             rightMargin: 0,
                                             bottomMargin: 0,
                                             onChanged: (value) {
@@ -130,6 +135,48 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                                       .highlightColor,
                                                   "Deposit Token",
                                                   depositNewToken,
+                                                  [amount, element["symbol"]])
+                                        ],
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Row(
+                                        children: [
+                                          inputField(
+                                            ctx: context,
+                                            controller: controllers[widget
+                                                .myBalances
+                                                .indexOf(element)],
+                                            labelText: "Input Amount",
+                                            leftMargin: 0,
+                                            topMargin: 5,
+                                            rightMargin: 0,
+                                            bottomMargin: 0,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                amount = value;
+                                              });
+                                            },
+                                            onSubmitted: (value) {
+                                              setState(() {
+                                                amount = value;
+                                              });
+                                            },
+                                          ),
+                                          element["symbol"] == "Eth"
+                                              ? button(
+                                                  Theme.of(context).buttonColor,
+                                                  Theme.of(context)
+                                                      .highlightColor,
+                                                  "Withdraw Eth",
+                                                  withdrawNewEth,
+                                                  [amount])
+                                              : button(
+                                                  Theme.of(context).buttonColor,
+                                                  Theme.of(context)
+                                                      .highlightColor,
+                                                  "Withdraw Token",
+                                                  withdrawNewToken,
                                                   [amount, element["symbol"]])
                                         ],
                                       ),

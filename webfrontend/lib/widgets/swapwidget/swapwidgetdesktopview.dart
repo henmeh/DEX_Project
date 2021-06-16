@@ -11,33 +11,39 @@ class SwapWidgetDesktopview extends StatefulWidget {
 }
 
 class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
-  String fromToken;
-  String toToken;
-  String fromAmount;
+  String ticker;
+  String amount;
+  String price;
+  TextEditingController amountLimitOrderController =
+      new TextEditingController();
+  TextEditingController amountMarketOrderController =
+      new TextEditingController();
+  TextEditingController priceController = new TextEditingController();
   Future tokens;
-  var quote;
-  int chain = 0;
+  int side;
 
-  List colors = [Colors.white, Colors.purpleAccent, Colors.purpleAccent];
-  List color = [1, 0, 0];
-
-  chainChoice(_choice) {
-    setState(() {
-      chain = _choice;
-      color = [0, 0, 0];
-      color[_choice] = 1;
-      fromToken = null;
-      toToken = null;
-      fromAmount = null;
-      widget.swapamount.text = "";
-      quote = null;
-    });
-  }
+  List colors = [Colors.purpleAccent, Colors.white];
+  List choosenColor = [0, 1];
 
   @override
   void initState() {
     tokens = getTokenlist();
     super.initState();
+  }
+
+  setTicker(List _arguments) {
+    setState(() {
+      String _ticker = _arguments[0];
+      ticker = _ticker;
+    });
+  }
+
+  setSide(int _side) {
+    setState(() {
+      side = _side;
+      choosenColor = [1, 1];
+      choosenColor[_side] = 0;
+    });
   }
 
   @override
@@ -51,7 +57,6 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
               width: (MediaQuery.of(context).size.width - 150) / 2,
               child: Center(child: CircularProgressIndicator()));
         } else {
-          List<Map> tokenList = tokensnapshot.data[chain];
           return Container(
             padding: EdgeInsets.all(30),
             height: (MediaQuery.of(context).size.height) / 2,
@@ -59,182 +64,122 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
             child: Card(
               color: Theme.of(context).primaryColor,
               //elevation: 10,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              child: Row(
                 children: [
-                  Row(
+                  Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      TextButton(
-                          onPressed: () => chainChoice(0),
-                          child: Text(
-                            "Ethereumchain",
-                            style: TextStyle(color: colors[color[0]]),
-                          )),
-                      TextButton(
-                          onPressed: () => chainChoice(1),
-                          child: Text(
-                            "BSCchain",
-                            style: TextStyle(color: colors[color[1]]),
-                          )),
-                      TextButton(
-                          onPressed: () => chainChoice(2),
-                          child: Text(
-                            "Polygon",
-                            style: TextStyle(color: colors[color[2]]),
-                          )),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        width: 300,
-                        child: inputField(
-                          ctx: context,
-                          controller: widget.swapamount,
-                          labelText: "Input the amount to swap",
-                          topMargin: 0,
-                          leftMargin: 0,
-                          rightMargin: 0,
-                          bottomMargin: 0,
-                          onChanged: (value) => null,
-                          onSubmitted: (value) => null,
-                        ),
+                        width: 500,
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: tokensnapshot.data.length,
+                            itemBuilder: (ctx, idx) {
+                              return button(
+                                  Theme.of(context).buttonColor,
+                                  Theme.of(context).highlightColor,
+                                  "Eth/" + tokensnapshot.data[idx],
+                                  setTicker,
+                                  [tokensnapshot.data[idx]]);
+                            }),
                       ),
-                      DropdownButtonHideUnderline(
-                        child: ButtonTheme(
-                          alignedDropdown: true,
-                          child: DropdownButton<String>(
-                            isDense: true,
-                            hint: new Text(
-                              "Select Token",
-                              style: TextStyle(
-                                  color: Theme.of(context).accentColor),
-                            ),
-                            value: fromToken,
-                            onChanged: (value) {
-                              setState(() {
-                                fromToken = value;
-                              });
-                            },
-                            items: tokenList.map((Map map) {
-                              return new DropdownMenuItem<String>(
-                                value: map["address"],
-                                child: Container(
-                                  width: 300,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Image.network(
-                                        map["logoURI"],
-                                        width: 25,
-                                      ),
-                                      Container(
-                                          margin: EdgeInsets.only(left: 10),
-                                          child: Text(
-                                            map["symbol"],
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .accentColor),
-                                          )),
-                                      //Container(
-                                      //    margin: EdgeInsets.only(left: 20),
-                                      //    child: Flexible(
-                                      //      child: Text(
-                                      //        map["name"],
-                                      //        style: TextStyle(
-                                      //            color: Theme.of(context)
-                                      //                .accentColor),
-                                      //      ),
-                                      //    )),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  button(
-                    Theme.of(context).buttonColor,
-                    Theme.of(context).highlightColor,
-                    "Swap Tokens",
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(
-                          width: 300,
-                          child: quote != null
-                              ? Text(
-                                  (int.parse(quote["toTokenAmount"]) /
-                                          pow(10, quote["toToken"]["decimals"]))
-                                      .toString(),
+                      Row(
+                        children: [
+                          TextButton(
+                              onPressed: () => setSide(0),
+                              child: Text(
+                                "Buy",
+                                style:
+                                    TextStyle(color: colors[choosenColor[0]]),
+                              )),
+                          TextButton(
+                              onPressed: () => setSide(1),
+                              child: Text("Sell",
                                   style: TextStyle(
-                                      color: Theme.of(context).highlightColor),
-                                )
-                              : Text("")),
-                      DropdownButtonHideUnderline(
-                        child: ButtonTheme(
-                          alignedDropdown: true,
-                          child: DropdownButton<String>(
-                            isDense: true,
-                            hint: new Text(
-                              "Select Token",
-                              style: TextStyle(
-                                  color: Theme.of(context).accentColor),
-                            ),
-                            value: toToken,
+                                      color: colors[choosenColor[1]]))),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          inputField(
+                            ctx: context,
+                            controller: amountLimitOrderController,
+                            labelText: "Input Tradingamount",
+                            leftMargin: 0,
+                            topMargin: 5,
+                            rightMargin: 0,
+                            bottomMargin: 0,
                             onChanged: (value) {
                               setState(() {
-                                toToken = value;
+                                amount = value;
                               });
                             },
-                            items: tokenList.map((Map map) {
-                              return new DropdownMenuItem<String>(
-                                value: map["address"],
-                                child: Container(
-                                  width: 300,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Image.network(
-                                        map["logoURI"],
-                                        width: 25,
-                                      ),
-                                      Container(
-                                          width: 123,
-                                          margin: EdgeInsets.only(left: 10),
-                                          child: Text(
-                                            map["symbol"],
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .accentColor),
-                                          )),
-                                      //Flexible(
-                                      //  child: Container(
-                                      //      width: 122,
-                                      //      margin: EdgeInsets.only(left: 20),
-                                      //      child: Text(
-                                      //        map["name"],
-                                      //        style: TextStyle(
-                                      //            color: Theme.of(context)
-                                      //                .accentColor),
-                                      //      )),
-                                      //),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }).toList(),
+                            onSubmitted: (value) {
+                              setState(() {
+                                amount = value;
+                              });
+                            },
                           ),
-                        ),
+                          inputField(
+                            ctx: context,
+                            controller: priceController,
+                            labelText: "Input Limit Price",
+                            leftMargin: 0,
+                            topMargin: 5,
+                            rightMargin: 0,
+                            bottomMargin: 0,
+                            onChanged: (value) {
+                              setState(() {
+                                price = value;
+                              });
+                            },
+                            onSubmitted: (value) {
+                              setState(() {
+                                price = value;
+                              });
+                            },
+                          ),
+                          button(
+                              Theme.of(context).buttonColor,
+                              Theme.of(context).highlightColor,
+                              "Place Limit Order",
+                              newLimitOrder,
+                              [side, ticker, amount, price])
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          inputField(
+                            ctx: context,
+                            controller: amountMarketOrderController,
+                            labelText: "Input Tradingamount",
+                            leftMargin: 0,
+                            topMargin: 5,
+                            rightMargin: 0,
+                            bottomMargin: 0,
+                            onChanged: (value) {
+                              setState(() {
+                                amount = value;
+                              });
+                            },
+                            onSubmitted: (value) {
+                              setState(() {
+                                amount = value;
+                              });
+                            },
+                          ),
+                          button(
+                              Theme.of(context).buttonColor,
+                              Theme.of(context).highlightColor,
+                              "Place Market Order",
+                              newMarketOrder,
+                              [side, ticker, amount])
+                        ],
                       )
                     ],
-                  )
+                  ),
+                  Container(child: Text("Placeholder for Pricediagramm"))
                 ],
               ),
             ),

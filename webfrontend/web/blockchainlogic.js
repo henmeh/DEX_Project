@@ -4,7 +4,6 @@ Moralis.serverURL = "https://sjusebrz6wqr.moralis.io:2053/server";
 async function init() {
     window.web3 = await Moralis.Web3.enable();
     window.ExchangeInstance = new web3.eth.Contract(exchangeAbi, addresses["exchange"]);
-    window.WalletInstance = new web3.eth.Contract(walletAbi, addresses["wallet"]);
     window.TokenInstance = new web3.eth.Contract(tokenAbi, addresses["token"]);
 }
 
@@ -12,9 +11,13 @@ init()
 
 async function getTokens() {
     try {
-        let tokens = await ExchangeInstance.methods.tokenList();
-        console.log(tokens);
-        return tokens;
+        let tokens = await ExchangeInstance.methods.getTokenlist().call();
+        let tokenList = [];
+        for(var i=0; i < tokens.length; i++) {
+            let token = web3.utils.toUtf8(tokens[i]);
+            tokenList.push(token);
+        }
+        return tokenList;
     } catch (error) { console.log(error); }
 }
 

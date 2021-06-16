@@ -73,7 +73,6 @@ Future getOrderbook(List _arguments) async {
 Future getTokenlist() async {
   var promise = getTokens();
   var tokens = await promiseToFuture(promise);
-  print(tokens);
   return tokens;
 }
 

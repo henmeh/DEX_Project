@@ -20,9 +20,13 @@ contract Wallet is Ownable {
     mapping(address => mapping (bytes32 => uint)) public balances;
 
     function addToken(bytes32 ticker, address tokenAddress) onlyOwner external {
-        //require(tokenMapping[ticker].ticker == bytes32(0) && tokenMapping[ticker].tokenAddress == address(0), "token already exists");
+        require(tokenMapping[ticker].ticker == bytes32(0) && tokenMapping[ticker].tokenAddress == address(0), "token already exists");
         tokenMapping[ticker] = Token(ticker, tokenAddress);
         tokenList.push(ticker);
+    }
+
+    function getTokenlist() public view returns(bytes32[] memory) {
+        return tokenList;
     }
 
     function deposit(uint amount, bytes32 ticker) external {

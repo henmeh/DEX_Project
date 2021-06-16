@@ -14,8 +14,8 @@ inputField(
     Function onSubmitted,
     Function onChanged}) {
   return Container(
-    height: 200,
-    width: 150,
+    height: 100,
+    width: 75,
     margin:
         EdgeInsets.fromLTRB(leftMargin, topMargin, rightMargin, bottomMargin),
     padding: EdgeInsets.all(3),
