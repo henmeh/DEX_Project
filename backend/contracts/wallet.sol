@@ -33,6 +33,10 @@ contract Wallet is Ownable {
         return (tokenMapping[ticker].ticker, tokenMapping[ticker].tokenAddress);
     }
 
+    function getBalances(bytes32 ticker) view external returns(uint) {
+        return balances[msg.sender][ticker];
+    }
+
     function deposit(uint amount, bytes32 ticker) external {
         require(tokenMapping[ticker].tokenAddress != address(0), "token is not added to wallet");
 

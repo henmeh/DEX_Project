@@ -11,7 +11,7 @@ class SwapWidgetDesktopview extends StatefulWidget {
 }
 
 class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
-  String ticker;
+  String ticker = "HT";
   String amount;
   String price;
   TextEditingController amountLimitOrderController =
@@ -21,7 +21,7 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
   TextEditingController priceController = new TextEditingController();
   Future tokens;
   Future orderBook;
-  int side;
+  int side = 0;
 
   List colors = [Colors.purpleAccent, Colors.white];
   List choosenColor = [0, 1];
@@ -29,14 +29,14 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
   @override
   void initState() {
     tokens = getTokenlist();
-    orderBook = getOrderbook([0, "HT"]);
     super.initState();
   }
 
   setTicker(List _arguments) {
-    setState(() {
+    setState(() async {
       String _ticker = _arguments[0];
       ticker = _ticker;
+      await getOrderbook([0, ticker]);
     });
   }
 
@@ -181,7 +181,10 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
                       )
                     ],
                   ),
-                  Container(child: Text("Placeholder for Pricediagramm"))
+                  Container(
+                      child: ticker == null
+                          ? Text("Placeholder for Pricediagramm")
+                          : Text(ticker))
                 ],
               ),
             ),

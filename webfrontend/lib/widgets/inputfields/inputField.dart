@@ -15,7 +15,7 @@ inputField(
     Function onChanged}) {
   return Container(
     height: 100,
-    width: 75,
+    width: 50,
     margin:
         EdgeInsets.fromLTRB(leftMargin, topMargin, rightMargin, bottomMargin),
     padding: EdgeInsets.all(3),

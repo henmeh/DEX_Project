@@ -16,13 +16,16 @@ class MyBalancesDesktopView extends StatefulWidget {
 
 class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
   var amount;
-  List controllers = [];
+  List depositControllers = [];
+  List withdrawControllers = [];
   @override
   Widget build(BuildContext context) {
     for (var i = 0; i < widget.myBalances.length; i++) {
-      controllers.add(new TextEditingController());
+      depositControllers.add(new TextEditingController());
     }
-    print(widget.myBalances);
+    for (var i = 0; i < widget.myBalances.length; i++) {
+      withdrawControllers.add(new TextEditingController());
+    }
     return widget.myBalances != []
         ? SingleChildScrollView(
             child: Row(
@@ -49,6 +52,12 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                         DataColumn(
                             label: Text(
                           "Balance",
+                          style:
+                              TextStyle(color: Theme.of(context).accentColor),
+                        )),
+                        DataColumn(
+                            label: Text(
+                          "Balance deposited in DEX",
                           style:
                               TextStyle(color: Theme.of(context).accentColor),
                         )),
@@ -98,14 +107,25 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                           color:
                                               Theme.of(context).highlightColor),
                                     )),
+                                    DataCell(Text(
+                                      (int.parse(element["exchangeBalance"]) /
+                                              pow(
+                                                  10,
+                                                  int.parse(
+                                                      element["decimals"])))
+                                          .toStringAsFixed(5),
+                                      style: TextStyle(
+                                          color:
+                                              Theme.of(context).highlightColor),
+                                    )),
                                     DataCell(
                                       Row(
                                         children: [
                                           inputField(
                                             ctx: context,
-                                            controller: controllers[widget
-                                                .myBalances
-                                                .indexOf(element)],
+                                            controller: depositControllers[
+                                                widget.myBalances
+                                                    .indexOf(element)],
                                             labelText: "Input Amount",
                                             leftMargin: 0,
                                             topMargin: 5,
@@ -149,9 +169,9 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                         children: [
                                           inputField(
                                             ctx: context,
-                                            controller: controllers[widget
-                                                .myBalances
-                                                .indexOf(element)],
+                                            controller: withdrawControllers[
+                                                widget.myBalances
+                                                    .indexOf(element)],
                                             labelText: "Input Amount",
                                             leftMargin: 0,
                                             topMargin: 5,
@@ -182,7 +202,11 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                                       .highlightColor,
                                                   "Withdraw Token",
                                                   withdrawNewToken,
-                                                  [amount, element["symbol"]])
+                                                  [
+                                                      amount,
+                                                      element["symbol"],
+                                                      element["decimals"]
+                                                    ])
                                         ],
                                       ),
                                     ),

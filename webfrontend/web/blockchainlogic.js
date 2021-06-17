@@ -23,13 +23,22 @@ async function getTokens() {
 
 async function createLimitOrder(_side, _ticker, _amount, _price) {
     try {
+        //ask Moralis for decimals
+        const params = { ticker: _ticker };
+        const decimals = await Moralis.Cloud.run("getTokenOnExchange", params);
+        
+        const _tradingAmount = parseFloat(_amount) * Math.pow(10, parseFloat(decimals));
+        const _tradingPrice = parseFloat(_price) * Math.pow(10, parseFloat(decimals));
+
+        console.log(_price * _tradingAmount);
+        
         //_side = 0 or 1
         // _ticker = String
         // _amount = String
         // _price = String
         user = await Moralis.User.current();
         const userAddress = user.get("ethAddress");
-        let limitOrder = await ExchangeInstance.methods.createLimitOrder(_side, web3.utils.fromUtf8(_ticker), web3.utils.toBN(_amount), web3.utils.toBN(_price)).send({from: userAddress});
+        let limitOrder = await ExchangeInstance.methods.createLimitOrder(_side, web3.utils.fromUtf8(_ticker), _tradingAmount, _price).send({from: userAddress});
     } catch (error) { console.log(error); }
 }
 
@@ -54,6 +63,20 @@ async function getOrderBook(_ticker, _side) {
     } catch (error) { console.log(error); }
 }
 
+async function getExchangeBalance(_ticker) {
+    try {
+        user = await Moralis.User.current();
+        const userAddress = user.get("ethAddress");
+        let balance;
+        if(_ticker == "Eth") {
+            balance = await ExchangeInstance.methods.balances(userAddress, web3.utils.fromUtf8("ETH")).call();
+        } else {
+            balance = await ExchangeInstance.methods.balances(userAddress, web3.utils.fromUtf8(_ticker)).call();
+        }
+        return balance;
+    } catch (error) { console.log(error); }
+}
+
 async function depositToken(_amount, _ticker) {
     try {
         //_amount = String
@@ -71,7 +94,7 @@ async function withdrawToken(_amount, _ticker) {
         // _ticker = String
         user = await Moralis.User.current();
         const userAddress = user.get("ethAddress");
-        let withdraw = await ExchangeInstance.methods.withdraw(web3.utils.toWei(web3.utils.toBN(_amount), "ether"), web3.utils.fromUtf8(_ticker)).send({from: userAddress});
+        let withdraw = await ExchangeInstance.methods.withdraw(_amount, web3.utils.fromUtf8(_ticker)).send({from: userAddress});
     } catch (error) { console.log(error); }
 }
 
@@ -89,7 +112,7 @@ async function withdrawEth(_amount) {
         //_amount = String
         user = await Moralis.User.current();
         const userAddress = user.get("ethAddress");
-        let withdraw = await ExchangeInstance.methods.withdrawEth(web3.utils.toWei(web3.utils.toBN(_amount), "ether")).send({from: userAddress});
+        let withdraw = await ExchangeInstance.methods.withdrawEth(web3.utils.toWei(_amount, "ether")).send({from: userAddress});
     } catch (error) { console.log(error); }
 }
 

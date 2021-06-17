@@ -30,56 +30,11 @@ Moralis.Cloud.define("getTokenBalances", async (request) => {
    return ethbalance;
   });
 
-  Moralis.Cloud.define("getBscBalance", async (request) => {
-    const query = new Moralis.Query("BscBalance");
-    query.equalTo("address", request.params.address);
-    const result = await query.first();
-    const bscbalance = result.get("balance")
-   return bscbalance;
-  });
-
-  Moralis.Cloud.define("getPolygonBalance", async (request) => {
-    const query = new Moralis.Query("PolygonBalance");
-    query.equalTo("address", request.params.address);
-    const result = await query.first();
-    const polygonbalance = result.get("balance")
-   return polygonbalance;
-  });
-
-  Moralis.Cloud.define("getNFTBalance", async (request) => {
-    const query = new Moralis.Query("EthNFTTokenOwners");
-    query.equalTo("owner_of", request.params.address);
-    const nftbalance = await query.find();
-   return nftbalance;
-  });
-
-Moralis.Cloud.beforeConsume('NewSwap', function (object) {
-    if(object.amount > 100000000000){
-        return true;
-    }
-    return false;
-})
-
-Moralis.Cloud.define("getLatestSwaps", async (request) => {
-  let allSwaps = [];
-  const query = new Moralis.Query("NewSwap");
-  query.descending("createdAt");
-  const swaps = await query.find();
-  for (var i = 0; i < swaps.length; i++) {
-    let swap = {
-      "srcToken": swaps[i].attributes.srcToken,
-      "srcTokenName": "",
-      "srcTokenSymbol": "",
-      "srcTokenDecimals": 0,
-      "dstToken": swaps[i].attributes.dstToken,
-      "dstTokenName": "",
-      "dstTokenSymbol": "",
-      "dstTokenDecimals": 0,
-      "amount": swaps[i].attributes.amount,
-      "minReturnAmount": swaps[i].attributes.minReturnAmount
-    }
-    allSwaps.push(swap);
-  }
-  return allSwaps;
+Moralis.Cloud.define("getTokenOnExchange", async (request) => {
+	const query = new Moralis.Query("EthTokenBalance");
+  	query.equalTo("address", "0x75fc08b6dae7619de7d6d480dd38ace2b3fc2732");
+  	query.equalTo("symbol", request.params.ticker);
+  	const result = await query.first();
+  	const decimals = result.get("decimals");
+  return decimals;
 });
-

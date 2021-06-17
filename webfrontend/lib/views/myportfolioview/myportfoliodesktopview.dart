@@ -12,7 +12,7 @@ class _MyPortfolioDesktopViewState extends State<MyPortfolioDesktopView> {
   Future myAssets;
   @override
   void initState() {
-    myAssets = getMyAssets();
+    myAssets = getBalances();
     super.initState();
   }
 

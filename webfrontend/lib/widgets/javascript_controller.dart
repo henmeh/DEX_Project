@@ -22,3 +22,4 @@ external dynamic withdrawToken(String _amount, String _ticker);
 external dynamic depositEth(String _amount);
 external dynamic withdrawEth(String _amount);
 external dynamic addToken(String _ticker, String _address);
+external dynamic getExchangeBalance(String _ticker);

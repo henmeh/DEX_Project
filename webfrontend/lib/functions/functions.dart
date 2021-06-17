@@ -7,18 +7,23 @@ import '../widgets/javascript_controller.dart';
 Future getBalances() async {
   var myBalances = [];
   var ethbalance = await getMyEthBalance();
+  var myexchangeBalance = await getMyExchangeBalance("Eth");
   Map eth = {
     "name": "Ether",
     "symbol": "Eth",
     "balance": ethbalance,
-    "decimals": "18"
+    "decimals": "18",
+    "exchangeBalance": myexchangeBalance
   };
   myBalances.add(eth);
 
   var promise = getTokenBalances();
   var balance = await promiseToFuture(promise);
   for (var i = 0; i < balance.length; i++) {
-    myBalances.add(json.decode(balance[i]));
+    var myBalance = json.decode(balance[i]);
+    var myexchangeBalance = await getMyExchangeBalance(myBalance["symbol"]);
+    myBalance["exchangeBalance"] = myexchangeBalance;
+    myBalances.add(myBalance);
   }
   return myBalances;
 }
@@ -30,18 +35,18 @@ Future getMyEthBalance() async {
   return ethbalance;
 }
 
+Future getMyExchangeBalance(String ticker) async {
+  var promise = getExchangeBalance(ticker);
+  var exchangebalance = await promiseToFuture(promise);
+  return exchangebalance;
+}
+
 //get my Transactions from Moralis
 Future getAllMyTransactions() async {
   var promise = getMyTransactions();
   var transactions = await promiseToFuture(promise);
   var transactionsdecoded = json.decode(transactions);
   return transactionsdecoded;
-}
-
-//get all my Assests
-Future getMyAssets() async {
-  var tokens = await getBalances();
-  return tokens;
 }
 
 //Limit Order
@@ -81,15 +86,18 @@ Future depositNewToken(List _arguments) async {
   String _amount = _arguments[0];
   String _ticker = _arguments[1];
   String _decimals = _arguments[2];
-  double _tradingAmount = double.parse(_amount) * pow(10, int.parse(_decimals));
-  var promise = depositToken(_tradingAmount.toString(), _ticker);
+  double _depositAmount = double.parse(_amount) * pow(10, int.parse(_decimals));
+  var promise = depositToken(_depositAmount.toString(), _ticker);
   var deposit = await promiseToFuture(promise);
 }
 
 Future withdrawNewToken(List _arguments) async {
   String _amount = _arguments[0];
   String _ticker = _arguments[1];
-  var promise = withdrawToken(_amount, _ticker);
+  String _decimals = _arguments[2];
+  double _withdrawAmount =
+      double.parse(_amount) * pow(10, int.parse(_decimals));
+  var promise = withdrawToken(_withdrawAmount.toString(), _ticker);
   var withdraw = await promiseToFuture(promise);
 }
 
