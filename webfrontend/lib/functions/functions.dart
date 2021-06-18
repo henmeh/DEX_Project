@@ -35,6 +35,14 @@ Future getMyEthBalance() async {
   return ethbalance;
 }
 
+//get my Tokendecimals from Moralis
+Future getTokenDecimals(List _arguments) async {
+  String ticker = _arguments[0];
+  var promise = getTokenDecimal(ticker);
+  var decimals = await promiseToFuture(promise);
+  return decimals;
+}
+
 Future getMyExchangeBalance(String ticker) async {
   var promise = getExchangeBalance(ticker);
   var exchangebalance = await promiseToFuture(promise);
@@ -70,9 +78,9 @@ Future newMarketOrder(List _arguments) async {
 Future getOrderbook(List _arguments) async {
   int _side = _arguments[0];
   String _ticker = _arguments[1];
+  List orderbook = [];
   var promise = getOrderBook(_ticker, _side);
-  var orderbook = await promiseToFuture(promise);
-  print(orderbook);
+  orderbook = await promiseToFuture(promise);
   return orderbook;
 }
 

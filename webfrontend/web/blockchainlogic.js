@@ -21,24 +21,42 @@ async function getTokens() {
     } catch (error) { console.log(error); }
 }
 
+async function getTokenDecimal(_ticker) {
+    try {
+        const params = { ticker: _ticker};
+        const decimals = await Moralis.Cloud.run("getTokenOnExchange", params);
+        return decimals;
+    } catch (error) { console.log(error); }
+}
+
 async function createLimitOrder(_side, _ticker, _amount, _price) {
     try {
         //ask Moralis for decimals
         const params = { ticker: _ticker };
         const decimals = await Moralis.Cloud.run("getTokenOnExchange", params);
-        
-        const _tradingAmount = parseFloat(_amount) * Math.pow(10, parseFloat(decimals));
-        const _tradingPrice = parseFloat(_price) * Math.pow(10, parseFloat(decimals));
-
-        console.log(_price * _tradingAmount);
-        
+                
         //_side = 0 or 1
         // _ticker = String
         // _amount = String
         // _price = String
+
+        //getting the decimals for price
+        var priceDecimals;
+        
+        if (_price.indexOf(".") !== -1 && _price.indexOf("-") !== -1) {
+            priceDecimals = _price.split("-")[1] || 0;
+        } else if (_price.indexOf(".") !== -1) {
+            priceDecimals = _price.split(".")[1].length || 0;
+        } else {
+            priceDecimals = _price.split("-")[1] || 0;
+        }
+
+        const _tradingAmount = parseFloat(_amount) * Math.pow(10, parseFloat(decimals));
+        const _tradingPrice = parseFloat(_price) * Math.pow(10, priceDecimals);
+
         user = await Moralis.User.current();
         const userAddress = user.get("ethAddress");
-        let limitOrder = await ExchangeInstance.methods.createLimitOrder(_side, web3.utils.fromUtf8(_ticker), _tradingAmount, _price).send({from: userAddress});
+        let limitOrder = await ExchangeInstance.methods.createLimitOrder(_side, web3.utils.fromUtf8(_ticker), _tradingAmount.toString(), _tradingPrice.toString(), Math.pow(10, priceDecimals).toString()).send({from: userAddress});
     } catch (error) { console.log(error); }
 }
 
@@ -58,7 +76,6 @@ async function getOrderBook(_ticker, _side) {
         //_side = 0 or 1
         // _ticker = String
         let orderBook = await ExchangeInstance.methods.getOrderBook(web3.utils.fromUtf8(_ticker), _side).call();
-        console.log(orderBook);
         return orderBook;
     } catch (error) { console.log(error); }
 }

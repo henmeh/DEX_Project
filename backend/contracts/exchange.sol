@@ -16,6 +16,7 @@ contract Exchange is Wallet {
         bytes32 ticker;
         uint amount;
         uint price;
+        uint priceDecimals;
         uint filled;
     }
     
@@ -28,16 +29,16 @@ contract Exchange is Wallet {
         return orderbook[ticker][uint(direction)];
     }
 
-    function createLimitOrder(Orderdirection direction, bytes32 ticker, uint amount, uint price) public {
+    function createLimitOrder(Orderdirection direction, bytes32 ticker, uint amount, uint price, uint priceDecimals) public {
         if(direction == Orderdirection.BUY) {
-            require(balances[msg.sender][bytes32("ETH")] >= amount.mul(price));
+            require(balances[msg.sender][bytes32("ETH")] >= amount.mul(price / priceDecimals));
         }
         else if(direction == Orderdirection.SELL) {
             require(balances[msg.sender][ticker] >= amount);
         }
 
         Order[] storage orders = orderbook[ticker][uint(direction)];
-        orders.push(Order(nextOrderId, msg.sender, direction, ticker, amount, price, 0));
+        orders.push(Order(nextOrderId, msg.sender, direction, ticker, amount, price, priceDecimals, 0));
         
         //Bubble sort
         //uint i = orders.length > 0 ? orders.length - 1 : 0;
@@ -88,7 +89,7 @@ contract Exchange is Wallet {
             uint cost = filled.mul(orders[i].price);
 
             if(direction == Orderdirection.BUY) {
-                require(balances[msg.sender][bytes32("ETH")] >= filled.mul(orders[i].price));
+                require(balances[msg.sender][bytes32("ETH")] >= filled.mul(orders[i].price / orders[i].priceDecimals));
                 //Transfer ETH from Buyer to Seller
                 balances[msg.sender][bytes32("ETH")] = balances[msg.sender][bytes32("ETH")].sub(cost);
                 balances[orders[i].trader][bytes32("ETH")] = balances[orders[i].trader][bytes32("ETH")].add(cost); 

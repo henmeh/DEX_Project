@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:web_app_template/widgets/charts/barchart.dart';
 import '../../functions/functions.dart';
 import '../../widgets/buttons/button.dart';
 import '../../widgets/inputfields/inputField.dart';
@@ -20,8 +21,10 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
       new TextEditingController();
   TextEditingController priceController = new TextEditingController();
   Future tokens;
-  Future orderBook;
   int side = 0;
+  List buyOrderBook = [];
+  List sellOrderBook = [];
+  String decimals;
 
   List colors = [Colors.purpleAccent, Colors.white];
   List choosenColor = [0, 1];
@@ -32,11 +35,13 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
     super.initState();
   }
 
-  setTicker(List _arguments) {
-    setState(() async {
+  Future setTicker(List _arguments) async {
+    buyOrderBook = await getOrderbook([0, ticker]);
+    sellOrderBook = await getOrderbook([1, ticker]);
+    decimals = await getTokenDecimals([ticker]);
+    setState(() {
       String _ticker = _arguments[0];
       ticker = _ticker;
-      await getOrderbook([0, ticker]);
     });
   }
 
@@ -51,6 +56,7 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
   @override
   Widget build(BuildContext context) {
     //var width = MediaQuery.of(context).size.width;
+    print(buyOrderBook.length);
     return FutureBuilder(
       future: tokens,
       builder: (ctx, tokensnapshot) {
@@ -182,9 +188,20 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
                     ],
                   ),
                   Container(
-                      child: ticker == null
+                      child: buyOrderBook.length == 0
                           ? Text("Placeholder for Pricediagramm")
-                          : Text(ticker))
+                          : Row(
+                              children: [
+                                BarChartWidget(
+                                    orderBook: buyOrderBook,
+                                    side: 0,
+                                    tokenDecimals: decimals),
+                                BarChartWidget(
+                                    orderBook: sellOrderBook,
+                                    side: 1,
+                                    tokenDecimals: decimals),
+                              ],
+                            ))
                 ],
               ),
             ),

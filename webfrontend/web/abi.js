@@ -206,6 +206,11 @@ var exchangeAbi = [
       },
       {
         "internalType": "uint256",
+        "name": "priceDecimals",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "filled",
         "type": "uint256"
       }
@@ -369,6 +374,11 @@ var exchangeAbi = [
           },
           {
             "internalType": "uint256",
+            "name": "priceDecimals",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
             "name": "filled",
             "type": "uint256"
           }
@@ -401,6 +411,11 @@ var exchangeAbi = [
       {
         "internalType": "uint256",
         "name": "price",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "priceDecimals",
         "type": "uint256"
       }
     ],
