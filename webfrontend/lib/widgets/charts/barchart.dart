@@ -15,7 +15,7 @@ class BarChartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(tokenDecimals);
+    print(orderBook);
     for (var i = 0; i < orderBook.length; i++) {
       if (double.parse(orderBook[i][4]) > _maxY) {
         _maxY = _maxY + double.parse(orderBook[i][4]);

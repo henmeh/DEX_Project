@@ -20,6 +20,7 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
   List withdrawControllers = [];
   @override
   Widget build(BuildContext context) {
+    print(widget.myBalances);
     for (var i = 0; i < widget.myBalances.length; i++) {
       depositControllers.add(new TextEditingController());
     }
@@ -107,17 +108,25 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                           color:
                                               Theme.of(context).highlightColor),
                                     )),
-                                    DataCell(Text(
-                                      (int.parse(element["exchangeBalance"]) /
-                                              pow(
-                                                  10,
-                                                  int.parse(
-                                                      element["decimals"])))
-                                          .toStringAsFixed(5),
-                                      style: TextStyle(
-                                          color:
-                                              Theme.of(context).highlightColor),
-                                    )),
+                                    DataCell(element["exchangeBalance"] != null
+                                        ? Text(
+                                            (int.parse(element[
+                                                        "exchangeBalance"]) /
+                                                    pow(
+                                                        10,
+                                                        int.parse(element[
+                                                            "decimals"])))
+                                                .toStringAsFixed(5),
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .highlightColor),
+                                          )
+                                        : Text(
+                                            "0",
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .highlightColor),
+                                          )),
                                     DataCell(
                                       Row(
                                         children: [

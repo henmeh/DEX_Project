@@ -1,4 +1,3 @@
-pragma solidity >=0.6.0 <=0.8.0;
 pragma experimental ABIEncoderV2;
 
 import "./wallet.sol";
@@ -30,8 +29,11 @@ contract Exchange is Wallet {
     }
 
     function createLimitOrder(Orderdirection direction, bytes32 ticker, uint amount, uint price, uint priceDecimals) public {
-        if(direction == Orderdirection.BUY) {
-            require(balances[msg.sender][bytes32("ETH")] >= amount.mul(price / priceDecimals));
+        if(direction == Orderdirection.BUY && priceDecimals == 0) {
+            require(balances[msg.sender][bytes32("ETH")] >= (amount.mul(price)));
+        }
+        else if(direction == Orderdirection.BUY && priceDecimals != 0) {
+            require(balances[msg.sender][bytes32("ETH")] >= (amount.mul(price)).div(priceDecimals));
         }
         else if(direction == Orderdirection.SELL) {
             require(balances[msg.sender][ticker] >= amount);
@@ -86,10 +88,19 @@ contract Exchange is Wallet {
             }
             totalFilled = totalFilled.add(filled);
             orders[i].filled = orders[i].filled.add(filled);
-            uint cost = filled.mul(orders[i].price);
+            uint cost = orders[i].priceDecimals != 0 ? (filled.mul(orders[i].price)).div(orders[i].priceDecimals) : (filled.mul(orders[i].price));
 
-            if(direction == Orderdirection.BUY) {
-                require(balances[msg.sender][bytes32("ETH")] >= filled.mul(orders[i].price / orders[i].priceDecimals));
+            if(direction == Orderdirection.BUY && orders[i].priceDecimals != 0) {
+                require(balances[msg.sender][bytes32("ETH")] >= (filled.mul(orders[i].price)).div(orders[i].priceDecimals));
+                //Transfer ETH from Buyer to Seller
+                balances[msg.sender][bytes32("ETH")] = balances[msg.sender][bytes32("ETH")].sub(cost);
+                balances[orders[i].trader][bytes32("ETH")] = balances[orders[i].trader][bytes32("ETH")].add(cost); 
+                //Transfer Tokens from Seller to Buyer
+                balances[msg.sender][ticker] = balances[msg.sender][ticker].add(filled);
+                balances[orders[i].trader][ticker] = balances[orders[i].trader][ticker].sub(filled); 
+            }
+            else if(direction == Orderdirection.BUY && orders[i].priceDecimals == 0) {
+                require(balances[msg.sender][bytes32("ETH")] >= (filled.mul(orders[i].price)));
                 //Transfer ETH from Buyer to Seller
                 balances[msg.sender][bytes32("ETH")] = balances[msg.sender][bytes32("ETH")].sub(cost);
                 balances[orders[i].trader][bytes32("ETH")] = balances[orders[i].trader][bytes32("ETH")].add(cost); 

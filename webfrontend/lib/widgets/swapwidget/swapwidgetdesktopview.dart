@@ -56,7 +56,6 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
   @override
   Widget build(BuildContext context) {
     //var width = MediaQuery.of(context).size.width;
-    print(buyOrderBook.length);
     return FutureBuilder(
       future: tokens,
       builder: (ctx, tokensnapshot) {
@@ -66,9 +65,8 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
               child: Center(child: CircularProgressIndicator()));
         } else {
           return Container(
-            padding: EdgeInsets.all(30),
-            height: (MediaQuery.of(context).size.height) / 2,
-            width: (MediaQuery.of(context).size.width - 150) / 2,
+            height: (MediaQuery.of(context).size.height) / 1.5,
+            width: (MediaQuery.of(context).size.width - 150) / 1.5,
             child: Card(
               color: Theme.of(context).primaryColor,
               //elevation: 10,
@@ -76,7 +74,7 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
                 children: [
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
                         width: 500,
@@ -188,20 +186,22 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
                     ],
                   ),
                   Container(
-                      child: buyOrderBook.length == 0
-                          ? Text("Placeholder for Pricediagramm")
-                          : Row(
-                              children: [
-                                BarChartWidget(
-                                    orderBook: buyOrderBook,
-                                    side: 0,
-                                    tokenDecimals: decimals),
-                                BarChartWidget(
-                                    orderBook: sellOrderBook,
-                                    side: 1,
-                                    tokenDecimals: decimals),
-                              ],
-                            ))
+                      child: Row(
+                    children: [
+                      buyOrderBook.length == 0
+                          ? Text("Empty Orderbook for Buy Side")
+                          : BarChartWidget(
+                              orderBook: buyOrderBook,
+                              side: 0,
+                              tokenDecimals: decimals),
+                      sellOrderBook.length == 0
+                          ? Text("Empty Orderbook for Sell Side")
+                          : BarChartWidget(
+                              orderBook: sellOrderBook,
+                              side: 1,
+                              tokenDecimals: decimals),
+                    ],
+                  ))
                 ],
               ),
             ),

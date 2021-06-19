@@ -62,12 +62,21 @@ async function createLimitOrder(_side, _ticker, _amount, _price) {
 
 async function createMarketOrder(_side, _ticker, _amount) {
     try {
+        //ask Moralis for decimals
+        const params = { ticker: _ticker };
+        const decimals = await Moralis.Cloud.run("getTokenOnExchange", params);
         //_side = 0 or 1
         // _ticker = String
         // _amount = String
+        const _tradingAmount = parseFloat(_amount) * Math.pow(10, parseFloat(decimals));
+        console.log(_side);
+        console.log(_ticker);
+        console.log(_tradingAmount);
+        
+        
         user = await Moralis.User.current();
         const userAddress = user.get("ethAddress");
-        let marketOrder = await ExchangeInstance.methods.createMarketOrder(_side, web3.utils.fromUtf8(_ticker), web3.utils.toBN(_amount)).send({from: userAddress});
+        let marketOrder = await ExchangeInstance.methods.createMarketOrder(_side, web3.utils.fromUtf8(_ticker), _tradingAmount.toString()).send({from: userAddress});
     } catch (error) { console.log(error); }
 }
 

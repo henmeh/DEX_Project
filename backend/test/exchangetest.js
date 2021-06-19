@@ -6,12 +6,13 @@ contract.skip("Exchange", accounts => {
     it("should throw an error if ETH balance is too low when creating BUY limit order", async () => {
         let exchange = await Exchange.deployed();
         let token = await Token.deployed();
+        
         await truffleAssert.reverts(
-            exchange.createLimitOrder(0, web3.utils.fromUtf8(token.symbol()), 10, 1)
+            exchange.createLimitOrder(0, web3.utils.fromUtf8(token.symbol()), "10000000000000000000", 1, 100)
         );
-        exchange.depositEth({ value: 10 });
+        exchange.depositEth({ value: 100000000000000000 });
         await truffleAssert.passes(
-            exchange.createLimitOrder(0, web3.utils.fromUtf8(token.symbol()), 10, 1)
+            exchange.createLimitOrder(0, web3.utils.fromUtf8(token.symbol()), "10000000000000000000", 1, 100)
         );
     })
 
@@ -19,23 +20,23 @@ contract.skip("Exchange", accounts => {
         let exchange = await Exchange.deployed();
         let token = await Token.deployed();
 
-        await truffleAssert.reverts(exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 10, 1));
+        await truffleAssert.reverts(exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), "10000000000000000000", 1, 100));
 
-        await token.approve(exchange.address, 500);
+        await token.approve(exchange.address, "10000000000000000000");
         await exchange.addToken(web3.utils.fromUtf8(token.symbol()), token.address);
-        await exchange.deposit(10, web3.utils.fromUtf8(token.symbol()));
+        await exchange.deposit("10000000000000000000", web3.utils.fromUtf8(token.symbol()));
 
-        await truffleAssert.passes(exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 10, 1));
+        await truffleAssert.passes(exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), "10000000000000000000", 1, 100));
     })
 
     it("buy orderbook should be orderd from highest to lowest price", async () => {
         let exchange = await Exchange.deployed();
         let token = await Token.deployed();
-        await token.approve(exchange.address, 500);
-        await exchange.depositEth({ value: 3000 });
-        await exchange.createLimitOrder(0, web3.utils.fromUtf8(token.symbol()), 1, 300);
-        await exchange.createLimitOrder(0, web3.utils.fromUtf8(token.symbol()), 1, 100);
-        await exchange.createLimitOrder(0, web3.utils.fromUtf8(token.symbol()), 1, 200);
+        await token.approve(exchange.address, "10000000000000000000");
+        await exchange.depositEth({ value: "300000000000000000" });
+        await exchange.createLimitOrder(0, web3.utils.fromUtf8(token.symbol()), "10000000000000000000", 2, 100);
+        await exchange.createLimitOrder(0, web3.utils.fromUtf8(token.symbol()), "10000000000000000000", 1, 100);
+        await exchange.createLimitOrder(0, web3.utils.fromUtf8(token.symbol()), "10000000000000000000", 3, 100);
 
         let orderbook = await exchange.getOrderBook(web3.utils.fromUtf8(token.symbol()), 0);
         if (orderbook.length > 0) {
@@ -48,10 +49,10 @@ contract.skip("Exchange", accounts => {
     it("sell orderbook should ordered from lowest to highest price", async () => {
         let exchange = await Exchange.deployed();
         let token = await Token.deployed();
-        await token.approve(exchange.address, 500);
-        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 1, 300);
-        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 1, 100);
-        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 1, 200);
+        await token.approve(exchange.address, "10000000000000000000");
+        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), "10000000000000000000", 2, 100);
+        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), "10000000000000000000", 1, 100);
+        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), "10000000000000000000", 3, 100);
 
         let orderbook = await exchange.getOrderBook(web3.utils.fromUtf8(token.symbol()), 1);
         assert(orderbook.length > 0);
@@ -64,7 +65,7 @@ contract.skip("Exchange", accounts => {
 })
 
 contract.skip("Exchange", accounts => {
-    it("Should throw an error when creating a sell market order without adequate token balance", async () => {
+    /*it("Should throw an error when creating a sell market order without adequate token balance", async () => {
         let exchange = await Exchange.deployed()
         let token = await Token.deployed()
 
@@ -72,7 +73,7 @@ contract.skip("Exchange", accounts => {
         assert.equal( balance.toNumber(), 0, "Initial token balance is not 0" );
         
         await truffleAssert.reverts(
-            exchange.createMarketOrder(1, web3.utils.fromUtf8(token.symbol()), 10)
+            exchange.createMarketOrder(1, web3.utils.fromUtf8(token.symbol()), "10000000000000000000")
         )
     })
     //Market orders can be submitted even if the order book is empty
@@ -80,13 +81,13 @@ contract.skip("Exchange", accounts => {
         let exchange = await Exchange.deployed()
         let token = await Token.deployed()
         
-        await exchange.depositEth({value: 50000});
+        await exchange.depositEth({value: "1000000000000000000"});
 
         let orderbook = await exchange.getOrderBook(web3.utils.fromUtf8(token.symbol()), 0); //Get buy side orderbook
         assert(orderbook.length == 0, "Buy side Orderbook length is not 0");
         
         await truffleAssert.passes(
-            exchange.createMarketOrder(0, web3.utils.fromUtf8(token.symbol()), 10)
+            exchange.createMarketOrder(0, web3.utils.fromUtf8(token.symbol()), "10000000000000000000")
         )
     })
     //Market orders should be filled until the order book is empty or the market order is 100% filled
@@ -99,37 +100,37 @@ contract.skip("Exchange", accounts => {
 
         await exchange.addToken(web3.utils.fromUtf8(token.symbol()), token.address)
 
-
         //Send token tokens to accounts 1, 2, 3 from account 0
-        await token.transfer(accounts[1], 150)
-        await token.transfer(accounts[2], 150)
-        await token.transfer(accounts[3], 150)
+        await token.transfer(accounts[1], "150000000000000000000")
+        await token.transfer(accounts[2], "150000000000000000000")
+        await token.transfer(accounts[3], "150000000000000000000")
 
         //Approve exchange for accounts 1, 2, 3
-        await token.approve(exchange.address, 50, {from: accounts[1]});
-        await token.approve(exchange.address, 50, {from: accounts[2]});
-        await token.approve(exchange.address, 50, {from: accounts[3]});
+        await token.approve(exchange.address, "50000000000000000000", {from: accounts[1]});
+        await token.approve(exchange.address, "50000000000000000000", {from: accounts[2]});
+        await token.approve(exchange.address, "50000000000000000000", {from: accounts[3]});
 
         //Deposit token into exchange for accounts 1, 2, 3
-        await exchange.deposit(50, web3.utils.fromUtf8(token.symbol()), {from: accounts[1]});
-        await exchange.deposit(50, web3.utils.fromUtf8(token.symbol()), {from: accounts[2]});
-        await exchange.deposit(50, web3.utils.fromUtf8(token.symbol()), {from: accounts[3]});
+        await exchange.deposit("50000000000000000000", web3.utils.fromUtf8(token.symbol()), {from: accounts[1]});
+        await exchange.deposit("50000000000000000000", web3.utils.fromUtf8(token.symbol()), {from: accounts[2]});
+        await exchange.deposit("50000000000000000000", web3.utils.fromUtf8(token.symbol()), {from: accounts[3]});
 
         //Fill up the sell order book
-        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 5, 300, {from: accounts[1]})
-        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 5, 400, {from: accounts[2]})
-        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 5, 500, {from: accounts[3]})
+        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), "5000000000000000000", 3, 100, {from: accounts[1]})
+        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), "5000000000000000000", 4, 100, {from: accounts[2]})
+        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), "5000000000000000000", 5, 100, {from: accounts[3]})
 
         //Create market order that should fill 2/3 orders in the book
-        await exchange.createMarketOrder(0, web3.utils.fromUtf8(token.symbol()), 10);
+        await exchange.depositEth({value: "1000000000000000000"});
+        await exchange.createMarketOrder(0, web3.utils.fromUtf8(token.symbol()), "10000000000000000000");
 
         orderbook = await exchange.getOrderBook(web3.utils.fromUtf8(token.symbol()), 1); //Get sell side orderbook
         assert(orderbook.length == 1, "Sell side Orderbook should only have 1 order left");
         assert(orderbook[0].filled == 0, "Sell side order should have 0 filled");
 
-    })
+    })*/
     //Market orders should be filled until the order book is empty or the market order is 100% filled
-    it("Market orders should be filled until the order book is empty", async () => {
+    /*it("Market orders should be filled until the order book is empty", async () => {
         let exchange = await Exchange.deployed()
         let token = await Token.deployed()
 
@@ -137,8 +138,8 @@ contract.skip("Exchange", accounts => {
         assert(orderbook.length == 1, "Sell side Orderbook should have 1 order left");
 
         //Fill up the sell order book again
-        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 5, 400, {from: accounts[1]})
-        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 5, 500, {from: accounts[2]})
+        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 5, 4, 0, {from: accounts[1]})
+        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 5, 5, 0, {from: accounts[2]})
 
         //check buyer token balance before token purchase
         let balanceBefore = await exchange.balances(accounts[0], web3.utils.fromUtf8(token.symbol()))
@@ -198,24 +199,24 @@ contract.skip("Exchange", accounts => {
 
         assert.equal(account1balanceBefore.toNumber() - 1, account1balanceAfter.toNumber());
         assert.equal(account2balanceBefore.toNumber() - 1, account2balanceAfter.toNumber());
-    })
+    }) */
 
     //Filled limit orders should be removed from the orderbook
-    it("Filled limit orders should be removed from the orderbook", async () => {
+    /*it("Filled limit orders should be removed from the orderbook", async () => {
         let exchange = await Exchange.deployed();
         let token = await Token.deployed();
         await exchange.addToken(web3.utils.fromUtf8(token.symbol()), token.address)
 
         //Seller deposits token and creates a sell limit order for 1 token for 300 wei
-        await token.approve(exchange.address, 500);
-        await exchange.deposit(50, web3.utils.fromUtf8(token.symbol()));
+        await token.approve(exchange.address, "1000000000000000000");
+        await exchange.deposit("1000000000000000000", web3.utils.fromUtf8(token.symbol()));
         
-        await exchange.depositEth({value: 10000});
+        await exchange.depositEth({value: "30000000000000000"});
 
         let orderbook = await exchange.getOrderBook(web3.utils.fromUtf8(token.symbol()), 1); //Get sell side orderbook
 
-        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 1, 300)
-        await exchange.createMarketOrder(0, web3.utils.fromUtf8(token.symbol()), 1);
+        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), "1000000000000000000", 3, 100)
+        await exchange.createMarketOrder(0, web3.utils.fromUtf8(token.symbol()), "1000000000000000000");
 
         orderbook = await exchange.getOrderBook(web3.utils.fromUtf8(token.symbol()), 1); //Get sell side orderbook
         assert(orderbook.length == 0, "Sell side Orderbook should be empty after trade");
@@ -229,13 +230,19 @@ contract.skip("Exchange", accounts => {
         let orderbook = await exchange.getOrderBook(web3.utils.fromUtf8(token.symbol()), 1); //Get sell side orderbook
         assert(orderbook.length == 0, "Sell side Orderbook should be empty at start of test");
 
-        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 5, 300, {from: accounts[1]})
-        await exchange.createMarketOrder(0, web3.utils.fromUtf8(token.symbol()), 2);
+        //Seller deposits token and creates a sell limit order for 1 token for 300 wei
+        await token.approve(exchange.address, "5000000000000000000");
+        await exchange.deposit("5000000000000000000", web3.utils.fromUtf8(token.symbol()));
+        
+        await exchange.depositEth({value: "60000000000000000"});
+
+        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), "5000000000000000000", 3, 100, {from: accounts[1]})
+        await exchange.createMarketOrder(0, web3.utils.fromUtf8(token.symbol()), "2000000000000000000");
 
         orderbook = await exchange.getOrderBook(web3.utils.fromUtf8(token.symbol()), 1); //Get sell side orderbook
         assert.equal(orderbook[0].filled, 2);
         assert.equal(orderbook[0].amount, 5);
-    })
+    })*/
     //When creating a BUY market order, the buyer needs to have enough ETH for the trade
     it("Should throw an error when creating a buy market order without adequate ETH balance", async () => {
         let exchange = await Exchange.deployed()
@@ -243,7 +250,7 @@ contract.skip("Exchange", accounts => {
         
         let balance = await exchange.balances(accounts[4], web3.utils.fromUtf8("ETH"))
         assert.equal( balance.toNumber(), 0, "Initial ETH balance is not 0" );
-        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 5, 300, {from: accounts[1]})
+        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 5, 300, 100, {from: accounts[1]})
 
         await truffleAssert.reverts(
             exchange.createMarketOrder(0, web3.utils.fromUtf8(token.symbol()), 5, {from: accounts[4]})
