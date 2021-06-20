@@ -6,9 +6,9 @@ fetched from Moralis.
 
 This is how the portfolio side looks
 
-![plot](./pictures/Portfolio.png){width=50%}
+![plot](./pictures/Portfolio.png)
 
 And here you can see the tradingview
 
-![plot](./pictures/TradingView.png){width=50%}
+![plot](./pictures/TradingView.png)
 
