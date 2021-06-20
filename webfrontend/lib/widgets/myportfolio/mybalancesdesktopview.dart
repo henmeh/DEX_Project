@@ -20,7 +20,6 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
   List withdrawControllers = [];
   @override
   Widget build(BuildContext context) {
-    print(widget.myBalances);
     for (var i = 0; i < widget.myBalances.length; i++) {
       depositControllers.add(new TextEditingController());
     }
@@ -135,11 +134,13 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                             controller: depositControllers[
                                                 widget.myBalances
                                                     .indexOf(element)],
-                                            labelText: "Input Amount",
+                                            //labelText: "",
                                             leftMargin: 0,
-                                            topMargin: 5,
+                                            topMargin: 0,
                                             rightMargin: 0,
                                             bottomMargin: 0,
+                                            height: 50,
+                                            width: 100,
                                             onChanged: (value) {
                                               setState(() {
                                                 amount = value;
@@ -181,11 +182,13 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                             controller: withdrawControllers[
                                                 widget.myBalances
                                                     .indexOf(element)],
-                                            labelText: "Input Amount",
+                                            //labelText: "",
                                             leftMargin: 0,
-                                            topMargin: 5,
+                                            topMargin: 0,
                                             rightMargin: 0,
                                             bottomMargin: 0,
+                                            height: 50,
+                                            width: 100,
                                             onChanged: (value) {
                                               setState(() {
                                                 amount = value;

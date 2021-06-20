@@ -12,10 +12,12 @@ inputField(
     FocusNode node1,
     FocusNode node2,
     Function onSubmitted,
-    Function onChanged}) {
+    Function onChanged,
+    double height,
+    double width}) {
   return Container(
-    height: 100,
-    width: 50,
+    height: height,
+    width: width,
     margin:
         EdgeInsets.fromLTRB(leftMargin, topMargin, rightMargin, bottomMargin),
     padding: EdgeInsets.all(3),
@@ -26,9 +28,9 @@ inputField(
       maxLines: null,
       controller: controller,
       //focusNode: node2,
-      //decoration: InputDecoration(
-      //    labelText: labelText,
-      //    labelStyle: TextStyle(fontSize: 12, color: Colors.black)),
+      decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: TextStyle(fontSize: 12, color: Colors.black)),
       onChanged: (value) {
         onSubmitted(value);
       },

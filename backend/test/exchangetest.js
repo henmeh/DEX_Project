@@ -64,7 +64,7 @@ contract.skip("Exchange", accounts => {
     })
 })
 
-contract.skip("Exchange", accounts => {
+contract("Exchange", accounts => {
     /*it("Should throw an error when creating a sell market order without adequate token balance", async () => {
         let exchange = await Exchange.deployed()
         let token = await Token.deployed()
@@ -220,7 +220,7 @@ contract.skip("Exchange", accounts => {
 
         orderbook = await exchange.getOrderBook(web3.utils.fromUtf8(token.symbol()), 1); //Get sell side orderbook
         assert(orderbook.length == 0, "Sell side Orderbook should be empty after trade");
-    })
+    })*/
 
     //Partly filled limit orders should be modified to represent the filled/remaining amount
     it("Limit orders filled property should be set correctly after a trade", async () => {
@@ -230,21 +230,24 @@ contract.skip("Exchange", accounts => {
         let orderbook = await exchange.getOrderBook(web3.utils.fromUtf8(token.symbol()), 1); //Get sell side orderbook
         assert(orderbook.length == 0, "Sell side Orderbook should be empty at start of test");
 
-        //Seller deposits token and creates a sell limit order for 1 token for 300 wei
-        await token.approve(exchange.address, "5000000000000000000");
-        await exchange.deposit("5000000000000000000", web3.utils.fromUtf8(token.symbol()));
-        
-        await exchange.depositEth({value: "60000000000000000"});
+        await token.transfer(accounts[1], 5)
 
-        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), "5000000000000000000", 3, 100, {from: accounts[1]})
-        await exchange.createMarketOrder(0, web3.utils.fromUtf8(token.symbol()), "2000000000000000000");
+        //Seller deposits token and creates a sell limit order for 1 token for 300 wei
+        await exchange.addToken(web3.utils.fromUtf8(token.symbol()), token.address);
+        await token.approve(exchange.address, 5, {from: accounts[1]});
+        await exchange.deposit(5, web3.utils.fromUtf8(token.symbol()), {from: accounts[1]});
+        
+        await exchange.depositEth({value: 6});
+
+        await exchange.createLimitOrder(1, web3.utils.fromUtf8(token.symbol()), 5, 3, 0, {from: accounts[1]})
+        await exchange.createMarketOrder(0, web3.utils.fromUtf8(token.symbol()), 2);
 
         orderbook = await exchange.getOrderBook(web3.utils.fromUtf8(token.symbol()), 1); //Get sell side orderbook
         assert.equal(orderbook[0].filled, 2);
         assert.equal(orderbook[0].amount, 5);
-    })*/
+    })
     //When creating a BUY market order, the buyer needs to have enough ETH for the trade
-    it("Should throw an error when creating a buy market order without adequate ETH balance", async () => {
+    /*it("Should throw an error when creating a buy market order without adequate ETH balance", async () => {
         let exchange = await Exchange.deployed()
         let token = await Token.deployed()
         
@@ -255,5 +258,5 @@ contract.skip("Exchange", accounts => {
         await truffleAssert.reverts(
             exchange.createMarketOrder(0, web3.utils.fromUtf8(token.symbol()), 5, {from: accounts[4]})
         )
-    })
+    })*/
 })

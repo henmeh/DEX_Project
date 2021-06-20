@@ -113,9 +113,11 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
                             controller: amountLimitOrderController,
                             labelText: "Input Tradingamount",
                             leftMargin: 0,
-                            topMargin: 5,
+                            topMargin: 0,
                             rightMargin: 0,
                             bottomMargin: 0,
+                            height: 60,
+                            width: 150,
                             onChanged: (value) {
                               setState(() {
                                 amount = value;
@@ -127,6 +129,7 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
                               });
                             },
                           ),
+                          SizedBox(width: 15),
                           inputField(
                             ctx: context,
                             controller: priceController,
@@ -135,6 +138,8 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
                             topMargin: 5,
                             rightMargin: 0,
                             bottomMargin: 0,
+                            height: 60,
+                            width: 150,
                             onChanged: (value) {
                               setState(() {
                                 price = value;
@@ -164,6 +169,8 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
                             topMargin: 5,
                             rightMargin: 0,
                             bottomMargin: 0,
+                            height: 60,
+                            width: 160,
                             onChanged: (value) {
                               setState(() {
                                 amount = value;
@@ -185,17 +192,26 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
                       )
                     ],
                   ),
+                  SizedBox(width: 25),
                   Container(
                       child: Row(
                     children: [
                       buyOrderBook.length == 0
-                          ? Text("Empty Orderbook for Buy Side")
+                          ? Text(
+                              "Empty Orderbook for Buy Side",
+                              style: TextStyle(
+                                  color: Theme.of(context).highlightColor),
+                            )
                           : BarChartWidget(
                               orderBook: buyOrderBook,
                               side: 0,
                               tokenDecimals: decimals),
                       sellOrderBook.length == 0
-                          ? Text("Empty Orderbook for Sell Side")
+                          ? Text(
+                              "Empty Orderbook for Sell Side",
+                              style: TextStyle(
+                                  color: Theme.of(context).highlightColor),
+                            )
                           : BarChartWidget(
                               orderBook: sellOrderBook,
                               side: 1,
