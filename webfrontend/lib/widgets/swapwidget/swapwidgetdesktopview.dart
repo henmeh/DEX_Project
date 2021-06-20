@@ -1,6 +1,7 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:web_app_template/widgets/charts/barchart.dart';
+import 'package:provider/provider.dart';
+import '../../provider/contractinteraction.dart';
+import '../../widgets/charts/barchart.dart';
 import '../../functions/functions.dart';
 import '../../widgets/buttons/button.dart';
 import '../../widgets/inputfields/inputField.dart';
@@ -24,7 +25,8 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
   int side = 0;
   List buyOrderBook = [];
   List sellOrderBook = [];
-  String decimals;
+  String decimals = "18";
+  var txold;
 
   List colors = [Colors.purpleAccent, Colors.white];
   List choosenColor = [0, 1];
@@ -32,6 +34,7 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
   @override
   void initState() {
     tokens = getTokenlist();
+    setTicker([ticker]);
     super.initState();
   }
 
@@ -55,14 +58,24 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
 
   @override
   Widget build(BuildContext context) {
-    //var width = MediaQuery.of(context).size.width;
+    var tx = Provider.of<Contractinteraction>(context).tx;
+    if (txold != tx) {
+      setState(() {
+        txold = tx;
+        tokens = getTokenlist();
+        setTicker([ticker]);
+      });
+    }
     return FutureBuilder(
       future: tokens,
       builder: (ctx, tokensnapshot) {
         if (tokensnapshot.connectionState == ConnectionState.waiting) {
           return Container(
               width: (MediaQuery.of(context).size.width - 150) / 2,
-              child: Center(child: CircularProgressIndicator()));
+              child: Center(
+                  child: CircularProgressIndicator(
+                color: Theme.of(context).accentColor,
+              )));
         } else {
           return Container(
             height: (MediaQuery.of(context).size.height) / 1.5,
@@ -155,7 +168,8 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
                               Theme.of(context).buttonColor,
                               Theme.of(context).highlightColor,
                               "Place Limit Order",
-                              newLimitOrder,
+                              Provider.of<Contractinteraction>(context)
+                                  .newLimitOrder,
                               [side, ticker, amount, price])
                         ],
                       ),
@@ -186,7 +200,8 @@ class _SwapWidgetDesktopviewState extends State<SwapWidgetDesktopview> {
                               Theme.of(context).buttonColor,
                               Theme.of(context).highlightColor,
                               "Place Market Order",
-                              newMarketOrder,
+                              Provider.of<Contractinteraction>(context)
+                                  .newMarketOrder,
                               [side, ticker, amount])
                         ],
                       )

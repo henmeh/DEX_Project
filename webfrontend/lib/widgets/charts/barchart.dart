@@ -15,14 +15,14 @@ class BarChartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(orderBook);
     for (var i = 0; i < orderBook.length; i++) {
-      if (double.parse(orderBook[i][4]) > _maxY) {
-        _maxY = _maxY + double.parse(orderBook[i][4]);
-      }
       buyAmount = buyAmount +
           double.parse(orderBook[i][4]) -
           double.parse(orderBook[i][7]);
+      //last round
+      if (i == orderBook.length - 1) {
+        _maxY = buyAmount;
+      }
       Map order = {
         "id": i,
         "amount": buyAmount.toString(),
@@ -31,10 +31,15 @@ class BarChartWidget extends StatelessWidget {
       };
       orderData.add(order);
     }
+    for (var i = 0; i < orderData.length - 1; i++) {
+      if (orderData[i]["price"] == orderData[i + 1]["price"]) {
+        orderData.remove(orderData[i]);
+      }
+    }
     barData = side == 0 ? List.from(orderData.reversed) : orderData;
     return Container(
       height: 300,
-      width: 400,
+      width: 300,
       child: BarChart(BarChartData(
         alignment: BarChartAlignment.center,
         maxY: (_maxY / pow(10, double.parse(tokenDecimals))),

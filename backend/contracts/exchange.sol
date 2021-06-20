@@ -47,7 +47,7 @@ contract Exchange is Wallet {
         
         if(direction == Orderdirection.BUY && orders.length > 1) {
             for(uint i = orders.length - 1; i > 0; i--) {
-                if(orders[i].price > orders[i-1].price) {
+                if((orders[i].price.mul(100)).div(orders[i].priceDecimals) > (orders[i-1].price.mul(100)).div(orders[i-1].priceDecimals)) {
                     Order memory ordertomove = orders[i];
                     orders[i] = orders[i-1];
                     orders[i-1] = ordertomove;
@@ -57,7 +57,7 @@ contract Exchange is Wallet {
         
         if(direction == Orderdirection.SELL && orders.length > 1) {
             for(uint i = orders.length - 1; i > 0; i--) {
-                if(orders[i].price < orders[i-1].price) {
+                if((orders[i].price.mul(100)).div(orders[i].priceDecimals) < (orders[i-1].price.mul(100)).div(orders[i-1].priceDecimals)) {
                     Order memory ordertomove = orders[i];
                     orders[i] = orders[i-1];
                     orders[i-1] = ordertomove;
@@ -94,24 +94,29 @@ contract Exchange is Wallet {
                 require(balances[msg.sender][bytes32("ETH")] >= (filled.mul(orders[i].price)).div(orders[i].priceDecimals));
                 //Transfer ETH from Buyer to Seller
                 balances[msg.sender][bytes32("ETH")] = balances[msg.sender][bytes32("ETH")].sub(cost);
-                balances[orders[i].trader][bytes32("ETH")] = balances[orders[i].trader][bytes32("ETH")].add(cost); 
+                balances[orders[i].trader][bytes32("ETH")] = balances[orders[i].trader][bytes32("ETH")].add(cost);
+                                
                 //Transfer Tokens from Seller to Buyer
                 balances[msg.sender][ticker] = balances[msg.sender][ticker].add(filled);
-                balances[orders[i].trader][ticker] = balances[orders[i].trader][ticker].sub(filled); 
+                balances[orders[i].trader][ticker] = balances[orders[i].trader][ticker].sub(filled);
+                 
             }
             else if(direction == Orderdirection.BUY && orders[i].priceDecimals == 0) {
                 require(balances[msg.sender][bytes32("ETH")] >= (filled.mul(orders[i].price)));
                 //Transfer ETH from Buyer to Seller
                 balances[msg.sender][bytes32("ETH")] = balances[msg.sender][bytes32("ETH")].sub(cost);
                 balances[orders[i].trader][bytes32("ETH")] = balances[orders[i].trader][bytes32("ETH")].add(cost); 
+                
                 //Transfer Tokens from Seller to Buyer
                 balances[msg.sender][ticker] = balances[msg.sender][ticker].add(filled);
                 balances[orders[i].trader][ticker] = balances[orders[i].trader][ticker].sub(filled); 
+                 
             }
             else if (direction == Orderdirection.SELL) {
                 //Transfer ETH from Buyer to Seller
                 balances[orders[i].trader][bytes32("ETH")] = balances[orders[i].trader][bytes32("ETH")].sub(cost);
                 balances[msg.sender][bytes32("ETH")] = balances[msg.sender][bytes32("ETH")].add(cost); 
+
                 //Transfer Tokens from Seller to Buyer
                 balances[orders[i].trader][ticker] = balances[orders[i].trader][ticker].add(filled);
                 balances[msg.sender][ticker] = balances[msg.sender][ticker].sub(filled); 

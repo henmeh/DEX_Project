@@ -1,9 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
-import 'package:web_app_template/functions/functions.dart';
-import 'package:web_app_template/widgets/buttons/button.dart';
-import 'package:web_app_template/widgets/inputfields/inputField.dart';
+import 'package:provider/provider.dart';
+import '../../provider/contractinteraction.dart';
+import '../../widgets/buttons/button.dart';
+import '../../widgets/inputfields/inputField.dart';
 
 class MyBalancesDesktopView extends StatefulWidget {
   final List myBalances;
@@ -18,13 +19,16 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
   var amount;
   List depositControllers = [];
   List withdrawControllers = [];
+
   @override
   Widget build(BuildContext context) {
-    for (var i = 0; i < widget.myBalances.length; i++) {
-      depositControllers.add(new TextEditingController());
-    }
-    for (var i = 0; i < widget.myBalances.length; i++) {
-      withdrawControllers.add(new TextEditingController());
+    if (widget.myBalances != null) {
+      for (var i = 0; i < widget.myBalances.length; i++) {
+        depositControllers.add(new TextEditingController());
+      }
+      for (var i = 0; i < widget.myBalances.length; i++) {
+        withdrawControllers.add(new TextEditingController());
+      }
     }
     return widget.myBalances != []
         ? SingleChildScrollView(
@@ -139,8 +143,8 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                             topMargin: 0,
                                             rightMargin: 0,
                                             bottomMargin: 0,
-                                            height: 50,
-                                            width: 100,
+                                            height: 40,
+                                            width: 50,
                                             onChanged: (value) {
                                               setState(() {
                                                 amount = value;
@@ -157,15 +161,21 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                                   Theme.of(context).buttonColor,
                                                   Theme.of(context)
                                                       .highlightColor,
-                                                  "Deposit Eth",
-                                                  depositNewEth,
-                                                  [amount])
+                                                  "Deposit",
+                                                  Provider.of<Contractinteraction>(
+                                                          context)
+                                                      .depositNewEth,
+                                                  [
+                                                      amount
+                                                    ])
                                               : button(
                                                   Theme.of(context).buttonColor,
                                                   Theme.of(context)
                                                       .highlightColor,
-                                                  "Deposit Token",
-                                                  depositNewToken,
+                                                  "Deposit",
+                                                  Provider.of<Contractinteraction>(
+                                                          context)
+                                                      .depositNewToken,
                                                   [
                                                       amount,
                                                       element["symbol"],
@@ -187,8 +197,8 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                             topMargin: 0,
                                             rightMargin: 0,
                                             bottomMargin: 0,
-                                            height: 50,
-                                            width: 100,
+                                            height: 40,
+                                            width: 50,
                                             onChanged: (value) {
                                               setState(() {
                                                 amount = value;
@@ -205,15 +215,21 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                                   Theme.of(context).buttonColor,
                                                   Theme.of(context)
                                                       .highlightColor,
-                                                  "Withdraw Eth",
-                                                  withdrawNewEth,
-                                                  [amount])
+                                                  "Withdraw",
+                                                  Provider.of<Contractinteraction>(
+                                                          context)
+                                                      .withdrawNewEth,
+                                                  [
+                                                      amount
+                                                    ])
                                               : button(
                                                   Theme.of(context).buttonColor,
                                                   Theme.of(context)
                                                       .highlightColor,
-                                                  "Withdraw Token",
-                                                  withdrawNewToken,
+                                                  "Withdraw",
+                                                  Provider.of<Contractinteraction>(
+                                                          context)
+                                                      .withdrawNewToken,
                                                   [
                                                       amount,
                                                       element["symbol"],
@@ -227,10 +243,13 @@ class _MyBalancesDesktopViewState extends State<MyBalancesDesktopView> {
                                             Theme.of(context).buttonColor,
                                             Theme.of(context).highlightColor,
                                             "Add Token",
-                                            addNewToken, [
-                                            element["symbol"],
-                                            element["token_address"]
-                                          ])
+                                            Provider.of<Contractinteraction>(
+                                                    context)
+                                                .addNewToken,
+                                            [
+                                                element["symbol"],
+                                                element["token_address"]
+                                              ])
                                         : Container()),
                                   ],
                                 )),

@@ -1,8 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:web_app_template/functions/functions.dart';
-import '../tokensymbols.dart';
 import '../../provider/contractinteraction.dart';
 import '../../provider/loginprovider.dart';
 import '../buttons/button.dart';
@@ -16,7 +14,6 @@ class _NavbardesktopState extends State<Navbardesktop> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<LoginModel>(context).user;
-    final image = Provider.of<LoginModel>(context).image;
     final tx = Provider.of<Contractinteraction>(context).tx;
     return Container(
       height: 75,
