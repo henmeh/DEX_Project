@@ -14,6 +14,7 @@ class MyPortfolioDesktopView extends StatefulWidget {
 class _MyPortfolioDesktopViewState extends State<MyPortfolioDesktopView> {
   Future myAssets;
   var txold;
+  var userold;
   @override
   void initState() {
     myAssets = getBalances();
@@ -27,6 +28,12 @@ class _MyPortfolioDesktopViewState extends State<MyPortfolioDesktopView> {
     if (txold != tx) {
       setState(() {
         txold = tx;
+        myAssets = getBalances();
+      });
+    }
+    if (userold != user) {
+      setState(() {
+        userold = user;
         myAssets = getBalances();
       });
     }

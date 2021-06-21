@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web_app_template/provider/loginprovider.dart';
-import 'package:web_app_template/widgets/oneinchanaytics/oneinchanalytics.dart';
 import '../../widgets/swapwidget/swapwidgetdesktopview.dart';
 import '../../widgets/sidebar/sidebardesktop.dart';
 
@@ -11,10 +10,15 @@ class SwapDesktopView extends StatefulWidget {
 }
 
 class _SwapDesktopViewState extends State<SwapDesktopView> {
+  var userold;
   @override
   Widget build(BuildContext context) {
     var user = Provider.of<LoginModel>(context).user;
-
+    if (userold != user) {
+      setState(() {
+        userold = user;
+      });
+    }
     return Row(
       children: [
         SidebarDesktop(2),
