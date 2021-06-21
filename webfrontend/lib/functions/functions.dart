@@ -7,6 +7,7 @@ Future getBalances() async {
   var myBalances = [];
   var ethbalance = await getMyEthBalance();
   var myexchangeBalance = await getMyExchangeBalance("Eth");
+  bool isHT = false;
   Map eth = {
     "name": "Ether",
     "symbol": "Eth",
@@ -18,14 +19,18 @@ Future getBalances() async {
 
   var promise = getTokenBalances();
   var balance = await promiseToFuture(promise);
-  if (balance.length != 0) {
-    for (var i = 0; i < balance.length; i++) {
-      var myBalance = json.decode(balance[i]);
-      var myexchangeBalance = await getMyExchangeBalance(myBalance["symbol"]);
-      myBalance["exchangeBalance"] = myexchangeBalance;
-      myBalances.add(myBalance);
+
+  for (var i = 0; i < balance.length; i++) {
+    var myBalance = json.decode(balance[i]);
+    var myexchangeBalance = await getMyExchangeBalance(myBalance["symbol"]);
+    myBalance["exchangeBalance"] = myexchangeBalance;
+    //check for HT Token
+    if (myBalance["name"] == "HenningToken") {
+      isHT = true;
     }
-  } else {
+    myBalances.add(myBalance);
+  }
+  if (isHT == false) {
     var myHTExchangeBalance = await getMyExchangeBalance("HT");
     var myBalance = {
       "name": "HenningToken",
