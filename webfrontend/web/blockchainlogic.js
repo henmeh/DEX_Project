@@ -1,5 +1,5 @@
-Moralis.initialize("V1ViKys0NnZgMieLR6DFI1NL540dJ99FNAtPx1eR")
-Moralis.serverURL = "https://sjusebrz6wqr.moralis.io:2053/server";
+Moralis.initialize("your moralis server id")
+Moralis.serverURL = "your moralis server";
 
 async function init() {
     window.web3 = await Moralis.Web3.enable();
